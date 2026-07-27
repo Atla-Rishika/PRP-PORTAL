@@ -75,6 +75,7 @@ const TrainingCoordinatorLogin = () => {
     };
     const closeModal = () => {
         setModal({ show: false, success: false, message: "" });
+        navigate('/PRP_Portal/TrainingCoordinator/Dashboard')
     };
 
 

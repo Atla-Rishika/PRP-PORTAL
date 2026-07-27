@@ -10,6 +10,12 @@ import TrainingCoordinatorLogin from "./Components-Login/TrainingCoordinatorLogi
 import ForgotPassword from "./Components-Login/ForgotPassword";
 import PlacementofficerLogin from "./Components-Login/PlacementofficerLogin";
 import AdminLogin from "./Components-Login/AdminLogin";
+import AdminDashboard from "./Components-Admin/AdminDashboard";
+import TrainerDashboardHome from "./Components-TrainingCo/TrainerDashboardHome";
+import StudentDashboardHome from "./Components-Student/StudentDashboardHome";
+import RecruiterDashboardHome from "./Components-Recruiter/RecruiterDashboardHome";
+import PlacementOffDashboardHome from "./Components-PlacementOfficer/PlacementOffDashboardHome";
+import AdminDashboardHome from "./Components-Admin/AdminDashboardHome";
 
 
 const router = createBrowserRouter([
@@ -48,6 +54,26 @@ const router = createBrowserRouter([
 {
   path:'/PRP_Portal/Login/Forgotpassword',
   element:<ForgotPassword/>
+},
+{
+  path: '/PRP_Portal/TrainingCoordinator/Dashboard',
+  element: <TrainerDashboardHome/>,
+},
+{
+  path: '/PRP_Portal/Admin/Dashboard',
+  element: <AdminDashboardHome/>
+},
+{
+  path: '/PRP_Portal/Student/Dashboard',
+  element: <StudentDashboardHome/>,
+},
+{
+  path: '/PRP_Portal/Recruiter/Dashboard',
+  element: <RecruiterDashboardHome/>,
+},
+{
+  path: '/PRP_Portal/PlacementOfficer/Dashboard',
+  element: <PlacementOffDashboardHome/>,
 },
 
 

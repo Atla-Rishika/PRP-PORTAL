@@ -54,6 +54,7 @@ const StudentLogin = () => {
     };
     const closeModal = () => {
         setModal({ show: false, success: false, message: "" });
+        navigate('/PRP_Portal/Student/Dashboard')
     };
 
     return (

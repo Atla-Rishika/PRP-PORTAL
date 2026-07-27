@@ -67,6 +67,7 @@ const RecruiterLogin = () => {
     };
     const closeModal = () => {
         setModal({ show: false, success: false, message: "" });
+        navigate('/PRP_Portal/Recruiter/Dashboard')
     };
 
 
@@ -129,7 +130,7 @@ const RecruiterLogin = () => {
                                     className={error.password? "UserLogin-Form-Input-Errors":"UserLogin-Form-Input"}
                                     type={showPassword ? "text" : "password"}
                                     name="password"
-                                    placeholder="********"
+                                    placeholder="password"
                                     id='Password'
                                     value={formValues.password}
                                     onChange={handleForm} 
