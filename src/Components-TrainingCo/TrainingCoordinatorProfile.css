@@ -1,0 +1,387 @@
+.trainingCoordinatorProfile {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  box-sizing: border-box;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  max-width: 1030px;
+}
+
+/* ===================== PROFILE CARD ===================== */
+/* Figma: 1030 x 220 */
+
+.trainingCoordinatorProfile__profileCard {
+  position: relative;
+  width: 1030px;
+  max-width: 100%;
+  height: 220px;
+  background: #ffffff;
+  border: 1px solid #ECE7F6;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(90, 24, 154, 0.06);
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Purple bottom section — Figma: Rectangle 756, 1030 x 110,
+   sits at Top:110 within the 220px card (so the white top area
+   is also exactly 110px). Children are positioned absolutely
+   inside it using the exact Figma offsets below. */
+.trainingCoordinatorProfile__purpleSection {
+  position: absolute;
+  left: 0;
+  top: 110px;
+  width: 100%;
+  height: 110px;
+  background: linear-gradient(135deg, #8D61D7, #7C4DFF);
+  box-sizing: border-box;
+}
+
+/* Figma: Rectangle 753 — 786 x 50, Top:113 / Left:159 relative to
+   the card (i.e. Top:3 / Left:159 relative to the purple section
+   above), Radius:6px, background Opacity:5%. */
+.trainingCoordinatorProfile__contactBar {
+  position: absolute;
+  top: 3px;
+  left: 159px;
+  width: 786px;
+  max-width: calc(100% - 183px);
+  height: 50px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  padding: 0 20px;
+}
+
+.trainingCoordinatorProfile__contactItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.trainingCoordinatorProfile__contactIcon {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  flex-shrink: 0;
+  /* Figma icons are exported grey; recolor to white to match the
+     contact bar text on the purple background. */
+  filter: brightness(0) invert(1);
+}
+
+/* Figma: bio text — 771 x 36, Top:175 / Left:159 relative to the
+   card (Top:65 relative to the purple section), Inter 400 15px,
+   line-height 100%, letter-spacing 0%. */
+.trainingCoordinatorProfile__bio {
+  position: absolute;
+  top: 65px;
+  left: 159px;
+  width: 771px;
+  max-width: calc(100% - 183px);
+  height: 36px;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.92);
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+/* Figma: avatar 118 x 118, active badge 76 x 26, Left:24 */
+.trainingCoordinatorProfile__avatarWrap {
+  position: absolute;
+  left: 24px;
+  top: 18px;
+  width: 118px;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.trainingCoordinatorProfile__avatar {
+  width: 118px;
+  height: 118px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #ffffff;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  display: block;
+  box-sizing: border-box;
+}
+
+.trainingCoordinatorProfile__activeBadge {
+  width: 76px;
+  height: 26px;
+  object-fit: fill;
+}
+
+/* Figma: name block 172 x 45, Left:158 */
+.trainingCoordinatorProfile__nameBlock {
+  position: absolute;
+  left: 158px;
+  top: 24px;
+  width: 172px;
+  height: 45px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+}
+
+.trainingCoordinatorProfile__name {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #12081F;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.trainingCoordinatorProfile__designation {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.55);
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+/* Figma: 140 x 48, Right:24 */
+.trainingCoordinatorProfile__editBtn {
+  position: absolute;
+  right: 24px;
+  top: 22px;
+  width: 140px;
+  height: 48px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #8D61D7, #7C4DFF);
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(124, 77, 255, 0.35);
+  transition: opacity 0.2s ease;
+  box-sizing: border-box;
+}
+
+.trainingCoordinatorProfile__editBtn:hover {
+  opacity: 0.92;
+}
+
+.trainingCoordinatorProfile__editIcon {
+  width: 15px;
+  height: 15px;
+  object-fit: contain;
+}
+
+/* ===================== INFO CARDS ===================== */
+/* Figma: each 488 x 276, gap = 1030 - 488*2 = 54 */
+
+.trainingCoordinatorProfile__infoGrid {
+  display: flex;
+  gap: 54px;
+  flex-wrap: wrap;
+}
+
+.trainingCoordinatorProfile__infoCard {
+  width: 488px;
+  height: 276px;
+  max-width: 100%;
+}
+
+.trainingCoordinatorProfile__infoCard,
+.trainingCoordinatorProfile__aboutCard {
+  background: #ffffff;
+  border: 1px solid #ECE7F6;
+  border-radius: 12px;
+  box-sizing: border-box;
+  box-shadow: 0 2px 12px rgba(90, 24, 154, 0.04);
+}
+
+.trainingCoordinatorProfile__infoCard {
+  padding: 24px 28px;
+}
+
+/* Figma: about card — Width Fixed 1029px, Height Hug 135px,
+   Radius 12px, Border 1px, Padding 20/28/20/28, vertical gap 12px
+   between the heading row and the paragraph. */
+.trainingCoordinatorProfile__aboutCard {
+  width: 1029px;
+  max-width: 100%;
+  min-height: 135px;
+  height: auto;
+  padding: 20px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.trainingCoordinatorProfile__infoCardHeading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.trainingCoordinatorProfile__aboutCard .trainingCoordinatorProfile__infoCardHeading {
+  margin-bottom: 0;
+}
+
+.trainingCoordinatorProfile__infoCardHeading h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #12081F;
+}
+
+.trainingCoordinatorProfile__infoCardIcon {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+
+.trainingCoordinatorProfile__infoCardFields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  row-gap: 20px;
+  column-gap: 20px;
+}
+
+.trainingCoordinatorProfile__field:nth-child(5) {
+  grid-column: 1 / -1;
+}
+
+.trainingCoordinatorProfile__fieldLabel {
+  margin: 0 0 6px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #12081F;
+}
+
+.trainingCoordinatorProfile__fieldValue {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.55);
+}
+
+/* ===================== ABOUT ME ===================== */
+
+.trainingCoordinatorProfile__aboutText {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+/* ===================== RESPONSIVE ===================== */
+/* Below the fixed Figma widths, fall back to a fluid layout so
+   nothing overflows or clips on smaller screens. Desktop (>=1100px)
+   stays pixel-exact to the Figma spec above. */
+
+@media screen and (max-width: 1100px) {
+  .trainingCoordinatorProfile__profileCard {
+    width: 100%;
+    height: auto;
+  }
+
+  .trainingCoordinatorProfile__purpleSection {
+    position: static;
+    height: auto;
+    padding: 60px 24px 24px 24px;
+    border-radius: 0 0 18px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .trainingCoordinatorProfile__contactBar {
+    position: static;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    flex-wrap: wrap;
+    padding: 12px 16px;
+  }
+
+  .trainingCoordinatorProfile__bio {
+    position: static;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    line-height: 1.6;
+  }
+
+  .trainingCoordinatorProfile__infoGrid {
+    gap: 24px;
+  }
+
+  .trainingCoordinatorProfile__infoCard {
+    width: 100%;
+    height: auto;
+    min-height: 276px;
+  }
+
+  .trainingCoordinatorProfile__aboutCard {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .trainingCoordinatorProfile__profileCard {
+    padding-top: 90px;
+  }
+
+  .trainingCoordinatorProfile__avatarWrap {
+    left: 50%;
+    transform: translateX(-50%);
+    top: 20px;
+  }
+
+  .trainingCoordinatorProfile__nameBlock {
+    left: 0;
+    width: 100%;
+    top: 150px;
+    align-items: center;
+    text-align: center;
+  }
+
+  .trainingCoordinatorProfile__name,
+  .trainingCoordinatorProfile__designation {
+    white-space: normal;
+  }
+
+  .trainingCoordinatorProfile__editBtn {
+    position: static;
+    margin: 16px auto 0 auto;
+  }
+
+  .trainingCoordinatorProfile__purpleSection {
+    margin-top: 110px;
+  }
+
+  .trainingCoordinatorProfile__infoCardFields {
+    grid-template-columns: 1fr;
+  }
+
+  .trainingCoordinatorProfile__field:nth-child(5) {
+    grid-column: auto;
+  }
+}

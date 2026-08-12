@@ -23,6 +23,7 @@ import CertificatesAct from '../assets/AdminAssets/CertificatesAct.png'
 import Minimize from '../assets/AdminAssets/Minimize.png'
 import Maximize from '../assets/AdminAssets/Maximize.png'
 import TrainerDashboard from './TrainerDashboard'
+import TrainingCoordinatorProfile from './TrainingCoordinatorProfile'
 import Footer from '../Components-LandingPage/Footer'
 
 const TrainerDashboardHome = () => {
@@ -92,7 +93,8 @@ const TrainerDashboardHome = () => {
             </div>
             )}
             <div className='AdminDashboard-Mainsec'>
-                {activetab==="Dashboard" && (<TrainerDashboard/>)}               
+                {activetab==="Dashboard" && (<TrainerDashboard/>)}
+                {activetab==="Profile" && (<TrainingCoordinatorProfile/>)}               
             </div>
         </div>
         </>
