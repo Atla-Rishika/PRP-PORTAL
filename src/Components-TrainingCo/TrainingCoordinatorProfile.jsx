@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import DashboardHeader from '../Resusable-Components/DashboardHeader';
 import profileLarge from '../assets/TCAssets/ProfilePage/profileLarge.png';
 import profileSmall from '../assets/TCAssets/ProfilePage/profileSmall.png';
@@ -12,22 +12,160 @@ import phoneIcon from '../assets/TCAssets/ProfilePage/phoneIcon.png';
 import locationIcon from '../assets/TCAssets/ProfilePage/locationIcon.png';
 import './TrainingCoordinatorProfile.css';
 
-const TrainingCoordinatorProfile = () => {
-  const personalInfo = [
-    { label: 'Email', value: 'priya5@eduhire.com' },
-    { label: 'Phone no', value: '+1 (555) 012-3456' },
-    { label: 'Date of birth', value: 'October 14, 1988' },
-    { label: 'Gender', value: 'Female' },
-    { label: 'Address', value: '745 ECR road ,Chennai - 100010' },
-  ];
 
-  const professionalInfo = [
-    { label: 'Designation', value: 'Training Co-ordinater' },
-    { label: 'Employee Id', value: 'TR-2024-2349' },
-    { label: 'Experience', value: '6+ years' },
-    { label: 'Joined On', value: 'Apr 15, 2024' },
-    { label: 'Institute Address', value: '745 OMR road ,Chennai - 105215' },
-  ];
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PHONE_PATTERN = /^[+]?[\d\s()-]{7,20}$/;
+const NAME_PATTERN = /^[A-Za-z][A-Za-z\s.'-]{1,49}$/;
+
+const isBlank = (value) => !value || !value.trim();
+
+
+const validators = {
+  required: (value, label) => (isBlank(value) ? `${label} is required.` : ''),
+  name: (value, label) => {
+    if (isBlank(value)) return `${label} is required.`;
+    if (!NAME_PATTERN.test(value.trim())) {
+      return `${label} should be 2-50 letters (spaces, hyphens, apostrophes allowed).`;
+    }
+    return '';
+  },
+  email: (value, label) => {
+    if (isBlank(value)) return `${label} is required.`;
+    if (!EMAIL_PATTERN.test(value.trim())) return `Enter a valid ${label.toLowerCase()}.`;
+    return '';
+  },
+  phone: (value, label) => {
+    if (isBlank(value)) return `${label} is required.`;
+    if (!PHONE_PATTERN.test(value.trim())) return `Enter a valid ${label.toLowerCase()}.`;
+    return '';
+  },
+  minLength: (min) => (value, label) => {
+    if (isBlank(value)) return `${label} is required.`;
+    if (value.trim().length < min) return `${label} should be at least ${min} characters.`;
+    return '';
+  },
+};
+
+
+const PERSONAL_FIELDS = [
+  { key: 'email', label: 'Email' },
+  { key: 'phoneNo', label: 'Phone no' },
+  { key: 'dob', label: 'Date of birth' },
+  { key: 'gender', label: 'Gender' },
+  { key: 'address', label: 'Address' },
+];
+
+const PROFESSIONAL_FIELDS = [
+  { key: 'proDesignation', label: 'Designation' },
+  { key: 'employeeId', label: 'Employee Id' },
+  { key: 'experience', label: 'Experience' },
+  { key: 'joinedOn', label: 'Joined On' },
+  { key: 'instituteAddress', label: 'Institute Address' },
+];
+
+const INITIAL_PROFILE = {
+  name: 'Priyanka',
+  designation: 'Training Co-ordinator',
+  email: 'priya5@eduhire.com',
+ 
+  contactPhone: '+91 9632417896',
+  location: 'Chennai,Tamil Nadu',
+  phoneNo: '+1 (555) 012-3456',
+  dob: 'October 14, 1988',
+  gender: 'Female',
+  address: '745 ECR road ,Chennai - 100010',
+  proDesignation: 'Training Co-ordinater',
+  employeeId: 'TR-2024-2349',
+  experience: '6+ years',
+  joinedOn: 'Apr 15, 2024',
+  instituteAddress: '745 OMR road ,Chennai - 105215',
+  bioText:
+    'Passionate about building career-ready students through structured training ' +
+    'programs and continuous learning initiations.',
+  aboutMeText:
+    'I coordinate ene-to-end training operations including batch planning, trainer ' +
+    'allocation, session scheduling, assessments, and student progress tracking. I strive ' +
+    'to ensure every student gets the rights training at the right time.',
+};
+
+const TrainingCoordinatorProfile = () => {
+  const [savedProfile, setSavedProfile] = useState(INITIAL_PROFILE);
+  const [draftProfile, setDraftProfile] = useState(INITIAL_PROFILE);
+  const [isEditing, setIsEditing] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  const handleChange = (key, value) => {
+    setDraftProfile((prev) => ({ ...prev, [key]: value }));
+    if (errors[key]) {
+      setErrors((prev) => {
+        const next = { ...prev };
+        delete next[key];
+        return next;
+      });
+    }
+  };
+
+  const startEditing = () => {
+    setDraftProfile(savedProfile);
+    setErrors({});
+    setIsEditing(true);
+  };
+
+  const handleCancel = () => {
+    setDraftProfile(savedProfile);
+    setErrors({});
+    setIsEditing(false);
+  };
+
+  const handleSave = () => {
+    const nextErrors = {};
+
+    const nameError = validators.name(draftProfile.name, 'Name');
+    if (nameError) nextErrors.name = nameError;
+
+    const designationError = validators.required(draftProfile.designation, 'Designation');
+    if (designationError) nextErrors.designation = designationError;
+
+    const emailError = validators.email(draftProfile.email, 'Email');
+    if (emailError) nextErrors.email = emailError;
+
+    const phoneError = validators.phone(draftProfile.contactPhone, 'Phone');
+    if (phoneError) nextErrors.contactPhone = phoneError;
+
+    const locationError = validators.required(draftProfile.location, 'Location');
+    if (locationError) nextErrors.location = locationError;
+
+   
+
+    const bioError = validators.minLength(10)(draftProfile.bioText, 'Bio');
+    if (bioError) nextErrors.bioText = bioError;
+
+    const aboutMeError = validators.minLength(20)(draftProfile.aboutMeText, 'About Me');
+    if (aboutMeError) nextErrors.aboutMeText = aboutMeError;
+
+    if (Object.keys(nextErrors).length > 0) {
+      setErrors(nextErrors);
+      return;
+    }
+
+    setSavedProfile(draftProfile);
+    setErrors({});
+    setIsEditing(false);
+  };
+
+  const profile = isEditing ? draftProfile : savedProfile;
+
+ 
+  const renderField = (field) => {
+    const value = profile[field.key];
+
+    return (
+      <div className="trainingCoordinatorProfile__field" key={field.key}>
+        <p className="trainingCoordinatorProfile__fieldLabel">{field.label}</p>
+        <p className="trainingCoordinatorProfile__fieldValue">{value}</p>
+      </div>
+    );
+  };
 
   return (
     <div className="trainingCoordinatorProfile">
@@ -44,22 +182,61 @@ const TrainingCoordinatorProfile = () => {
           <div className="trainingCoordinatorProfile__contactBar">
             <span className="trainingCoordinatorProfile__contactItem">
               <img src={mailIcon} alt="" className="trainingCoordinatorProfile__contactIcon" />
-              priya5@eduhire.com
+              {isEditing ? (
+                <input
+                  type="text"
+                  className="trainingCoordinatorProfile__contactInput"
+                  value={draftProfile.email}
+                  onChange={(e) => handleChange('email', e.target.value)}
+                />
+              ) : (
+                profile.email
+              )}
             </span>
             <span className="trainingCoordinatorProfile__contactItem">
               <img src={phoneIcon} alt="" className="trainingCoordinatorProfile__contactIcon" />
-              +91 9632417896
+              {isEditing ? (
+                <input
+                  type="text"
+                  className="trainingCoordinatorProfile__contactInput"
+                  value={draftProfile.contactPhone}
+                  onChange={(e) => handleChange('contactPhone', e.target.value)}
+                />
+              ) : (
+                profile.contactPhone
+              )}
             </span>
             <span className="trainingCoordinatorProfile__contactItem">
               <img src={locationIcon} alt="" className="trainingCoordinatorProfile__contactIcon" />
-              Chennai,Tamil Nadu
+              {isEditing ? (
+                <input
+                  type="text"
+                  className="trainingCoordinatorProfile__contactInput"
+                  value={draftProfile.location}
+                  onChange={(e) => handleChange('location', e.target.value)}
+                />
+              ) : (
+                profile.location
+              )}
             </span>
           </div>
 
-          <p className="trainingCoordinatorProfile__bio">
-            Passionate about building career-ready students through structured training
-            programs and continuous learning initiations.
-          </p>
+          {isEditing ? (
+            <>
+              <textarea
+                className={`trainingCoordinatorProfile__bio trainingCoordinatorProfile__bio--input${errors.bioText ? ' trainingCoordinatorProfile__fieldInput--error' : ''}`}
+                value={draftProfile.bioText}
+                onChange={(e) => handleChange('bioText', e.target.value)}
+              />
+              {errors.bioText && (
+                <p className="trainingCoordinatorProfile__fieldError trainingCoordinatorProfile__bioError">
+                  {errors.bioText}
+                </p>
+              )}
+            </>
+          ) : (
+            <p className="trainingCoordinatorProfile__bio">{profile.bioText}</p>
+          )}
         </div>
 
         <div className="trainingCoordinatorProfile__avatarWrap">
@@ -76,13 +253,37 @@ const TrainingCoordinatorProfile = () => {
         </div>
 
         <div className="trainingCoordinatorProfile__nameBlock">
-          <h2 className="trainingCoordinatorProfile__name">Priyanka</h2>
-          <p className="trainingCoordinatorProfile__designation">Training Co-ordinator</p>
+          {isEditing ? (
+            <>
+              <input
+                type="text"
+                className={`trainingCoordinatorProfile__nameInput${errors.name ? ' trainingCoordinatorProfile__fieldInput--error' : ''}`}
+                value={draftProfile.name}
+                onChange={(e) => handleChange('name', e.target.value)}
+              />
+              <input
+                type="text"
+                className={`trainingCoordinatorProfile__designationInput${errors.designation ? ' trainingCoordinatorProfile__fieldInput--error' : ''}`}
+                value={draftProfile.designation}
+                onChange={(e) => handleChange('designation', e.target.value)}
+              />
+            </>
+          ) : (
+            <>
+              <h2 className="trainingCoordinatorProfile__name">{profile.name}</h2>
+              <p className="trainingCoordinatorProfile__designation">{profile.designation}</p>
+            </>
+          )}
         </div>
 
-        <button className="trainingCoordinatorProfile__editBtn" type="button">
+        <button
+          className="trainingCoordinatorProfile__editBtn"
+          type="button"
+          onClick={startEditing}
+          disabled={isEditing}
+        >
           <img src={editIcon} alt="" className="trainingCoordinatorProfile__editIcon" />
-          Edit Profile
+          {isEditing ? 'Editing…' : 'Edit Profile'}
         </button>
       </div>
 
@@ -93,12 +294,7 @@ const TrainingCoordinatorProfile = () => {
             <h3>Personal Information</h3>
           </div>
           <div className="trainingCoordinatorProfile__infoCardFields">
-            {personalInfo.map((field) => (
-              <div className="trainingCoordinatorProfile__field" key={field.label}>
-                <p className="trainingCoordinatorProfile__fieldLabel">{field.label}</p>
-                <p className="trainingCoordinatorProfile__fieldValue">{field.value}</p>
-              </div>
-            ))}
+            {PERSONAL_FIELDS.map(renderField)}
           </div>
         </div>
 
@@ -108,12 +304,7 @@ const TrainingCoordinatorProfile = () => {
             <h3>Professional Information</h3>
           </div>
           <div className="trainingCoordinatorProfile__infoCardFields">
-            {professionalInfo.map((field) => (
-              <div className="trainingCoordinatorProfile__field" key={field.label}>
-                <p className="trainingCoordinatorProfile__fieldLabel">{field.label}</p>
-                <p className="trainingCoordinatorProfile__fieldValue">{field.value}</p>
-              </div>
-            ))}
+            {PROFESSIONAL_FIELDS.map(renderField)}
           </div>
         </div>
       </div>
@@ -123,12 +314,44 @@ const TrainingCoordinatorProfile = () => {
           <img src={aboutMeIcon} alt="" className="trainingCoordinatorProfile__infoCardIcon" />
           <h3>About Me</h3>
         </div>
-        <p className="trainingCoordinatorProfile__aboutText">
-          I coordinate ene-to-end training operations including batch planning, trainer
-          allocation, session scheduling, assessments, and student progress tracking. I strive
-          to ensure every student gets the rights training at the right time.
-        </p>
+        {isEditing ? (
+          <>
+            <textarea
+              className={`trainingCoordinatorProfile__aboutText trainingCoordinatorProfile__aboutText--input${errors.aboutMeText ? ' trainingCoordinatorProfile__fieldInput--error' : ''}`}
+              value={draftProfile.aboutMeText}
+              onChange={(e) => handleChange('aboutMeText', e.target.value)}
+            />
+            {errors.aboutMeText && (
+              <p className="trainingCoordinatorProfile__fieldError">{errors.aboutMeText}</p>
+            )}
+          </>
+        ) : (
+          <p className="trainingCoordinatorProfile__aboutText">{savedProfile.aboutMeText}</p>
+        )}
       </div>
+
+      {isEditing && (
+        <div className="trainingCoordinatorProfile__actionBar">
+          <div className="trainingCoordinatorProfile__actionBarButtons">
+            <button
+              type="button"
+              className="trainingCoordinatorProfile__cancelBtn"
+              onClick={handleCancel}
+            >
+              <span className="trainingCoordinatorProfile__cancelIcon" aria-hidden="true" />
+              Cancel
+            </button>
+            <button
+              type="button"
+              className="trainingCoordinatorProfile__saveBtn"
+              onClick={handleSave}
+            >
+              <span className="trainingCoordinatorProfile__saveIcon" aria-hidden="true" />
+              Save Changes
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
