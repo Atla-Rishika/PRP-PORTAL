@@ -74,7 +74,7 @@ const INITIAL_PROFILE = {
   dob: 'October 14, 1988',
   gender: 'Female',
   address: '745 ECR road ,Chennai - 100010',
-  proDesignation: 'Training Co-ordinater',
+  proDesignation: 'Training Co-ordinator',
   employeeId: 'TR-2024-2349',
   experience: '6+ years',
   joinedOn: 'Apr 15, 2024',
@@ -83,9 +83,9 @@ const INITIAL_PROFILE = {
     'Passionate about building career-ready students through structured training ' +
     'programs and continuous learning initiations.',
   aboutMeText:
-    'I coordinate ene-to-end training operations including batch planning, trainer ' +
+    'I coordinate end-to-end training operations including batch planning, trainer ' +
     'allocation, session scheduling, assessments, and student progress tracking. I strive ' +
-    'to ensure every student gets the rights training at the right time.',
+    'to ensure every student gets the right training at the right time.',
 };
 
 const TrainingCoordinatorProfile = () => {
