@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import DashboardHeader from '../Resusable-Components/DashboardHeader';
 import profileLarge from '../assets/TCAssets/ProfilePage/profileLarge.png';
 import profileSmall from '../assets/TCAssets/ProfilePage/profileSmall.png';
@@ -6,6 +6,7 @@ import personalInfoIcon from '../assets/TCAssets/ProfilePage/personalInfoIcon.pn
 import professionalInfoIcon from '../assets/TCAssets/ProfilePage/professionalInfoIcon.png';
 import aboutMeIcon from '../assets/TCAssets/ProfilePage/aboutMeIcon.png';
 import editIcon from '../assets/TCAssets/ProfilePage/editIcon.png';
+import cameraIcon from '../assets/TCAssets/ProfilePage/cameraIcon.png';
 import activeBadge from '../assets/TCAssets/ProfilePage/activeBadge.png';
 import mailIcon from '../assets/TCAssets/ProfilePage/mailIcon.png';
 import phoneIcon from '../assets/TCAssets/ProfilePage/phoneIcon.png';
@@ -17,7 +18,22 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_PATTERN = /^[+]?[\d\s()-]{7,20}$/;
 const NAME_PATTERN = /^[A-Za-z][A-Za-z\s.'-]{1,49}$/;
 
+const PHOTO_ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+const PHOTO_MAX_SIZE_MB = 2;
+const PHOTO_MAX_SIZE_BYTES = PHOTO_MAX_SIZE_MB * 1024 * 1024;
+
 const isBlank = (value) => !value || !value.trim();
+
+const validatePhotoFile = (file) => {
+  if (!file) return 'Profile photo is required.';
+  if (!PHOTO_ALLOWED_TYPES.includes(file.type)) {
+    return 'Photo must be a JPG, PNG, or WEBP image.';
+  }
+  if (file.size > PHOTO_MAX_SIZE_BYTES) {
+    return `Photo must be smaller than ${PHOTO_MAX_SIZE_MB}MB.`;
+  }
+  return '';
+};
 
 
 const validators = {
@@ -66,6 +82,7 @@ const PROFESSIONAL_FIELDS = [
 const INITIAL_PROFILE = {
   name: 'Priyanka',
   designation: 'Training Co-ordinator',
+  photo: profileLarge,
   email: 'priya5@eduhire.com',
  
   contactPhone: '+91 9632417896',
@@ -93,6 +110,7 @@ const TrainingCoordinatorProfile = () => {
   const [draftProfile, setDraftProfile] = useState(INITIAL_PROFILE);
   const [isEditing, setIsEditing] = useState(false);
   const [errors, setErrors] = useState({});
+  const photoInputRef = useRef(null);
 
   const handleChange = (key, value) => {
     setDraftProfile((prev) => ({ ...prev, [key]: value }));
@@ -103,6 +121,36 @@ const TrainingCoordinatorProfile = () => {
         return next;
       });
     }
+  };
+
+  const handlePhotoButtonClick = () => {
+    if (photoInputRef.current) {
+      photoInputRef.current.click();
+    }
+  };
+
+  const handlePhotoChange = (e) => {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+
+    const photoError = validatePhotoFile(file);
+    if (photoError) {
+      setErrors((prev) => ({ ...prev, photo: photoError }));
+      return;
+    }
+
+    setErrors((prev) => {
+      const next = { ...prev };
+      delete next.photo;
+      return next;
+    });
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setDraftProfile((prev) => ({ ...prev, photo: reader.result }));
+    };
+    reader.readAsDataURL(file);
   };
 
   const startEditing = () => {
@@ -135,7 +183,11 @@ const TrainingCoordinatorProfile = () => {
     const locationError = validators.required(draftProfile.location, 'Location');
     if (locationError) nextErrors.location = locationError;
 
-   
+    if (!draftProfile.photo) {
+      nextErrors.photo = 'Profile photo is required.';
+    } else if (errors.photo) {
+      nextErrors.photo = errors.photo;
+    }
 
     const bioError = validators.minLength(10)(draftProfile.bioText, 'Bio');
     if (bioError) nextErrors.bioText = bioError;
@@ -241,8 +293,8 @@ const TrainingCoordinatorProfile = () => {
 
         <div className="trainingCoordinatorProfile__avatarWrap">
           <img
-            src={profileLarge}
-            alt="Priyanka"
+            src={isEditing ? draftProfile.photo : profile.photo}
+            alt={profile.name}
             className="trainingCoordinatorProfile__avatar"
           />
           <img
@@ -250,7 +302,31 @@ const TrainingCoordinatorProfile = () => {
             alt="Active"
             className="trainingCoordinatorProfile__activeBadge"
           />
+          {isEditing && (
+            <>
+              <button
+                type="button"
+                className="trainingCoordinatorProfile__photoEditBtn"
+                onClick={handlePhotoButtonClick}
+                aria-label="Change profile photo"
+              >
+                <img src={cameraIcon} alt="" className="trainingCoordinatorProfile__photoEditIcon" />
+              </button>
+              <input
+                ref={photoInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="trainingCoordinatorProfile__photoInput"
+                onChange={handlePhotoChange}
+              />
+            </>
+          )}
         </div>
+        {isEditing && errors.photo && (
+          <p className="trainingCoordinatorProfile__fieldError trainingCoordinatorProfile__photoError">
+            {errors.photo}
+          </p>
+        )}
 
         <div className="trainingCoordinatorProfile__nameBlock">
           {isEditing ? (

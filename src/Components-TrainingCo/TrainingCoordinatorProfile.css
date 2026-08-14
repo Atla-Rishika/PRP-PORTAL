@@ -107,6 +107,43 @@
   box-sizing: border-box;
 }
 
+.trainingCoordinatorProfile__photoInput {
+  display: none;
+}
+
+.trainingCoordinatorProfile__photoEditBtn {
+  position: absolute;
+  right: -2px;
+  bottom: 2px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #8D61D7, #7C4DFF);
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  z-index: 5;
+}
+
+.trainingCoordinatorProfile__photoEditIcon {
+  width: 15px;
+  height: 15px;
+  object-fit: contain;
+}
+
+.trainingCoordinatorProfile__photoError {
+  position: absolute;
+  left: 24px;
+  top: 178px;
+  width: 160px;
+  z-index: 5;
+  margin: 0;
+}
+
 .trainingCoordinatorProfile__activeBadge {
   position: absolute;
  
