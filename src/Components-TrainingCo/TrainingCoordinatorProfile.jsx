@@ -16,7 +16,10 @@ import './TrainingCoordinatorProfile.css';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_PATTERN = /^[+]?[\d\s()-]{7,20}$/;
-const NAME_PATTERN = /^[A-Za-z][A-Za-z\s.'-]{1,49}$/;
+const EMPLOYEE_ID_PATTERN = /^[A-Za-z]{1,6}-\d{4}-\d{2,6}$/;
+const EXPERIENCE_PATTERN = /^\d+(\.\d+)?\+?\s*(year|years|yr|yrs)$/i;
+
+const GENDER_OPTIONS = ['Female', 'Male', 'Non-binary', 'Prefer not to say'];
 
 const PHOTO_ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const PHOTO_MAX_SIZE_MB = 2;
@@ -38,13 +41,6 @@ const validatePhotoFile = (file) => {
 
 const validators = {
   required: (value, label) => (isBlank(value) ? `${label} is required.` : ''),
-  name: (value, label) => {
-    if (isBlank(value)) return `${label} is required.`;
-    if (!NAME_PATTERN.test(value.trim())) {
-      return `${label} should be 2-50 letters (spaces, hyphens, apostrophes allowed).`;
-    }
-    return '';
-  },
   email: (value, label) => {
     if (isBlank(value)) return `${label} is required.`;
     if (!EMAIL_PATTERN.test(value.trim())) return `Enter a valid ${label.toLowerCase()}.`;
@@ -60,6 +56,16 @@ const validators = {
     if (value.trim().length < min) return `${label} should be at least ${min} characters.`;
     return '';
   },
+  oneOf: (options) => (value, label) => {
+    if (isBlank(value)) return `${label} is required.`;
+    if (!options.includes(value)) return `Select a valid ${label.toLowerCase()}.`;
+    return '';
+  },
+  pattern: (regex, message) => (value, label) => {
+    if (isBlank(value)) return `${label} is required.`;
+    if (!regex.test(value.trim())) return message || `Enter a valid ${label.toLowerCase()}.`;
+    return '';
+  },
 };
 
 
@@ -71,6 +77,18 @@ const PERSONAL_FIELDS = [
   { key: 'address', label: 'Address' },
 ];
 
+
+const PERSONAL_VALIDATORS = {
+  email: (value) => validators.email(value, 'Email'),
+  phoneNo: (value) => validators.phone(value, 'Phone no'),
+  dob: (value) => validators.minLength(6)(value, 'Date of birth'),
+  gender: (value) => validators.oneOf(GENDER_OPTIONS)(value, 'Gender'),
+  address: (value) => validators.minLength(10)(value, 'Address'),
+};
+
+
+const validateAboutMe = (value) => validators.minLength(20)(value, 'About Me');
+
 const PROFESSIONAL_FIELDS = [
   { key: 'proDesignation', label: 'Designation' },
   { key: 'employeeId', label: 'Employee Id' },
@@ -79,15 +97,29 @@ const PROFESSIONAL_FIELDS = [
   { key: 'instituteAddress', label: 'Institute Address' },
 ];
 
+
+const PROFESSIONAL_VALIDATORS = {
+  proDesignation: (value) => validators.required(value, 'Designation'),
+  employeeId: (value) =>
+    validators.pattern(EMPLOYEE_ID_PATTERN, 'Employee id should look like "TR-2024-2349".')(
+      value,
+      'Employee Id'
+    ),
+  experience: (value) =>
+    validators.pattern(EXPERIENCE_PATTERN, 'Experience should look like "6+ years".')(
+      value,
+      'Experience'
+    ),
+  joinedOn: (value) => validators.required(value, 'Joined On'),
+  instituteAddress: (value) => validators.minLength(10)(value, 'Institute Address'),
+};
+
 const INITIAL_PROFILE = {
   name: 'Priyanka',
   designation: 'Training Co-ordinator',
   photo: profileLarge,
   email: 'priya5@eduhire.com',
- 
-  contactPhone: '+91 9632417896',
-  location: 'Chennai,Tamil Nadu',
-  phoneNo: '+1 (555) 012-3456',
+  phoneNo: '+91 9632417896',
   dob: 'October 14, 1988',
   gender: 'Female',
   address: '745 ECR road ,Chennai - 100010',
@@ -112,7 +144,8 @@ const TrainingCoordinatorProfile = () => {
   const [errors, setErrors] = useState({});
   const photoInputRef = useRef(null);
 
-  const handleChange = (key, value) => {
+  
+  const handlePersonalChange = (key, value) => {
     setDraftProfile((prev) => ({ ...prev, [key]: value }));
     if (errors[key]) {
       setErrors((prev) => {
@@ -168,20 +201,10 @@ const TrainingCoordinatorProfile = () => {
   const handleSave = () => {
     const nextErrors = {};
 
-    const nameError = validators.name(draftProfile.name, 'Name');
-    if (nameError) nextErrors.name = nameError;
-
-    const designationError = validators.required(draftProfile.designation, 'Designation');
-    if (designationError) nextErrors.designation = designationError;
-
-    const emailError = validators.email(draftProfile.email, 'Email');
-    if (emailError) nextErrors.email = emailError;
-
-    const phoneError = validators.phone(draftProfile.contactPhone, 'Phone');
-    if (phoneError) nextErrors.contactPhone = phoneError;
-
-    const locationError = validators.required(draftProfile.location, 'Location');
-    if (locationError) nextErrors.location = locationError;
+    PERSONAL_FIELDS.forEach((field) => {
+      const error = PERSONAL_VALIDATORS[field.key](draftProfile[field.key]);
+      if (error) nextErrors[field.key] = error;
+    });
 
     if (!draftProfile.photo) {
       nextErrors.photo = 'Profile photo is required.';
@@ -189,10 +212,7 @@ const TrainingCoordinatorProfile = () => {
       nextErrors.photo = errors.photo;
     }
 
-    const bioError = validators.minLength(10)(draftProfile.bioText, 'Bio');
-    if (bioError) nextErrors.bioText = bioError;
-
-    const aboutMeError = validators.minLength(20)(draftProfile.aboutMeText, 'About Me');
+    const aboutMeError = validateAboutMe(draftProfile.aboutMeText);
     if (aboutMeError) nextErrors.aboutMeText = aboutMeError;
 
     if (Object.keys(nextErrors).length > 0) {
@@ -207,14 +227,63 @@ const TrainingCoordinatorProfile = () => {
 
   const profile = isEditing ? draftProfile : savedProfile;
 
+  const renderPersonalField = (field) => {
+    if (!isEditing) {
+      return (
+        <div className="trainingCoordinatorProfile__field" key={field.key}>
+          <p className="trainingCoordinatorProfile__fieldLabel">{field.label}</p>
+          <p className="trainingCoordinatorProfile__fieldValue">{profile[field.key]}</p>
+        </div>
+      );
+    }
+
+    const value = draftProfile[field.key];
+    const error = errors[field.key];
+    const inputClassName = `trainingCoordinatorProfile__fieldInput${
+      error ? ' trainingCoordinatorProfile__fieldInput--error' : ''
+    }`;
+
+    return (
+      <div className="trainingCoordinatorProfile__field" key={field.key}>
+        <p className="trainingCoordinatorProfile__fieldLabel">{field.label}</p>
+        {field.key === 'gender' ? (
+          <select
+            className={inputClassName}
+            value={value}
+            onChange={(e) => handlePersonalChange(field.key, e.target.value)}
+          >
+            <option value="" disabled>
+              Select gender
+            </option>
+            {GENDER_OPTIONS.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+        ) : (
+          <input
+            type="text"
+            className={inputClassName}
+            value={value}
+            onChange={(e) => handlePersonalChange(field.key, e.target.value)}
+          />
+        )}
+        {error && <p className="trainingCoordinatorProfile__fieldError">{error}</p>}
+      </div>
+    );
+  };
+
  
-  const renderField = (field) => {
-    const value = profile[field.key];
+  const renderProfessionalField = (field) => {
+    const value = savedProfile[field.key];
+    const error = PROFESSIONAL_VALIDATORS[field.key](value);
 
     return (
       <div className="trainingCoordinatorProfile__field" key={field.key}>
         <p className="trainingCoordinatorProfile__fieldLabel">{field.label}</p>
         <p className="trainingCoordinatorProfile__fieldValue">{value}</p>
+        {error && <p className="trainingCoordinatorProfile__fieldError">{error}</p>}
       </div>
     );
   };
@@ -234,66 +303,24 @@ const TrainingCoordinatorProfile = () => {
           <div className="trainingCoordinatorProfile__contactBar">
             <span className="trainingCoordinatorProfile__contactItem">
               <img src={mailIcon} alt="" className="trainingCoordinatorProfile__contactIcon" />
-              {isEditing ? (
-                <input
-                  type="text"
-                  className="trainingCoordinatorProfile__contactInput"
-                  value={draftProfile.email}
-                  onChange={(e) => handleChange('email', e.target.value)}
-                />
-              ) : (
-                profile.email
-              )}
+              {profile.email}
             </span>
             <span className="trainingCoordinatorProfile__contactItem">
               <img src={phoneIcon} alt="" className="trainingCoordinatorProfile__contactIcon" />
-              {isEditing ? (
-                <input
-                  type="text"
-                  className="trainingCoordinatorProfile__contactInput"
-                  value={draftProfile.contactPhone}
-                  onChange={(e) => handleChange('contactPhone', e.target.value)}
-                />
-              ) : (
-                profile.contactPhone
-              )}
+              {profile.phoneNo}
             </span>
             <span className="trainingCoordinatorProfile__contactItem">
               <img src={locationIcon} alt="" className="trainingCoordinatorProfile__contactIcon" />
-              {isEditing ? (
-                <input
-                  type="text"
-                  className="trainingCoordinatorProfile__contactInput"
-                  value={draftProfile.location}
-                  onChange={(e) => handleChange('location', e.target.value)}
-                />
-              ) : (
-                profile.location
-              )}
+              {profile.address}
             </span>
           </div>
 
-          {isEditing ? (
-            <>
-              <textarea
-                className={`trainingCoordinatorProfile__bio trainingCoordinatorProfile__bio--input${errors.bioText ? ' trainingCoordinatorProfile__fieldInput--error' : ''}`}
-                value={draftProfile.bioText}
-                onChange={(e) => handleChange('bioText', e.target.value)}
-              />
-              {errors.bioText && (
-                <p className="trainingCoordinatorProfile__fieldError trainingCoordinatorProfile__bioError">
-                  {errors.bioText}
-                </p>
-              )}
-            </>
-          ) : (
-            <p className="trainingCoordinatorProfile__bio">{profile.bioText}</p>
-          )}
+          <p className="trainingCoordinatorProfile__bio">{profile.bioText}</p>
         </div>
 
         <div className="trainingCoordinatorProfile__avatarWrap">
           <img
-            src={isEditing ? draftProfile.photo : profile.photo}
+            src={profile.photo}
             alt={profile.name}
             className="trainingCoordinatorProfile__avatar"
           />
@@ -329,27 +356,8 @@ const TrainingCoordinatorProfile = () => {
         )}
 
         <div className="trainingCoordinatorProfile__nameBlock">
-          {isEditing ? (
-            <>
-              <input
-                type="text"
-                className={`trainingCoordinatorProfile__nameInput${errors.name ? ' trainingCoordinatorProfile__fieldInput--error' : ''}`}
-                value={draftProfile.name}
-                onChange={(e) => handleChange('name', e.target.value)}
-              />
-              <input
-                type="text"
-                className={`trainingCoordinatorProfile__designationInput${errors.designation ? ' trainingCoordinatorProfile__fieldInput--error' : ''}`}
-                value={draftProfile.designation}
-                onChange={(e) => handleChange('designation', e.target.value)}
-              />
-            </>
-          ) : (
-            <>
-              <h2 className="trainingCoordinatorProfile__name">{profile.name}</h2>
-              <p className="trainingCoordinatorProfile__designation">{profile.designation}</p>
-            </>
-          )}
+          <h2 className="trainingCoordinatorProfile__name">{profile.name}</h2>
+          <p className="trainingCoordinatorProfile__designation">{profile.designation}</p>
         </div>
 
         <button
@@ -370,7 +378,7 @@ const TrainingCoordinatorProfile = () => {
             <h3>Personal Information</h3>
           </div>
           <div className="trainingCoordinatorProfile__infoCardFields">
-            {PERSONAL_FIELDS.map(renderField)}
+            {PERSONAL_FIELDS.map(renderPersonalField)}
           </div>
         </div>
 
@@ -380,7 +388,7 @@ const TrainingCoordinatorProfile = () => {
             <h3>Professional Information</h3>
           </div>
           <div className="trainingCoordinatorProfile__infoCardFields">
-            {PROFESSIONAL_FIELDS.map(renderField)}
+            {PROFESSIONAL_FIELDS.map(renderProfessionalField)}
           </div>
         </div>
       </div>
@@ -393,9 +401,11 @@ const TrainingCoordinatorProfile = () => {
         {isEditing ? (
           <>
             <textarea
-              className={`trainingCoordinatorProfile__aboutText trainingCoordinatorProfile__aboutText--input${errors.aboutMeText ? ' trainingCoordinatorProfile__fieldInput--error' : ''}`}
+              className={`trainingCoordinatorProfile__aboutText trainingCoordinatorProfile__aboutText--input${
+                errors.aboutMeText ? ' trainingCoordinatorProfile__fieldInput--error' : ''
+              }`}
               value={draftProfile.aboutMeText}
-              onChange={(e) => handleChange('aboutMeText', e.target.value)}
+              onChange={(e) => handlePersonalChange('aboutMeText', e.target.value)}
             />
             {errors.aboutMeText && (
               <p className="trainingCoordinatorProfile__fieldError">{errors.aboutMeText}</p>
